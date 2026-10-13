@@ -3,81 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Corpers' Forum Studio | Prestige FM 91.7 Minna</title>
+  <title>Corpers' Forum Studio Hub | Prestige FM 91.7 Minna</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Jitsi Meet Real-Time WebRTC Bridge -->
-  <script src="https://meet.jit.si/external_api.js"></script>
   <style>
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #047857; border-radius: 4px; }
-    iframe { border-radius: 12px; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .speaking-pulse {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #047857;
+      border-radius: 4px;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased select-none overflow-hidden">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased select-none">
 
   <!-- ========================================== -->
-  <!-- 1. REAL ONBOARDING & LOBBY SCREEN -->
+  <!-- 1. ONBOARDING & LOBBY SCREEN -->
   <!-- ========================================== -->
-  <div id="lobby-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-md bg-slate-900 border border-emerald-800/80 rounded-2xl p-6 shadow-2xl">
+  <div id="onboarding-screen" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-lg bg-slate-900 border border-emerald-800/80 rounded-2xl p-6 shadow-2xl relative my-auto">
       
-      <!-- Logo & Station Branding -->
+      <!-- Logo & Header -->
       <div class="flex items-center space-x-3.5 mb-5 border-b border-emerald-900/60 pb-4">
         <div class="w-14 h-14 rounded-full border-2 border-amber-500 overflow-hidden bg-emerald-950 flex items-center justify-center flex-shrink-0 shadow">
           <img src="logo.jpg" alt="Logo" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-microphone-lines text-amber-400 text-2xl\'></i>';" class="w-full h-full object-cover">
         </div>
         <div>
-          <div class="flex items-center space-x-1.5">
-            <h2 class="text-base font-black tracking-wide text-white uppercase">Corpers' Forum</h2>
+          <div class="flex items-center space-x-2">
+            <h2 class="text-base sm:text-lg font-black tracking-wide text-white uppercase">Corpers' Forum</h2>
             <span class="bg-amber-500/20 text-amber-400 border border-amber-500/50 text-[10px] px-1.5 py-0.5 rounded font-bold">91.7 FM</span>
           </div>
-          <p class="text-xs text-emerald-400 font-medium">Where Your Voice Counts • Minna[cite: 1, 2]</p>
+          <p class="text-xs text-emerald-400 font-medium">Where Your Voice Counts • Prestige FM Minna[cite: 1, 2]</p>
         </div>
       </div>
 
-      <!-- Schedule Notice -->
-      <div class="bg-emerald-950/70 border border-emerald-800/50 rounded-xl p-3 mb-4 text-xs">
-        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Meeting Portal</span>
-        <p class="text-slate-200 font-semibold mt-0.5">Sunday Pre-Review & Monday Post-Review (8:00 PM)</p>
+      <!-- Meeting Notice -->
+      <div class="bg-emerald-950/60 border border-emerald-800/50 rounded-xl p-3 mb-5 flex items-center justify-between text-xs">
+        <div>
+          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Meeting Sessions</span>
+          <p class="text-slate-200 font-semibold mt-0.5">Sunday Pre-Review & Monday Post-Review (8:00 PM)</p>
+        </div>
+        <span class="bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-md text-[11px] font-mono font-bold">
+          3-4 HR DURATION
+        </span>
       </div>
 
-      <!-- User Identification Form -->
-      <form onsubmit="joinLiveRoom(event)" class="space-y-3.5">
+      <!-- Onboarding Form -->
+      <form onsubmit="handleJoinMeeting(event)" class="space-y-4">
+        
+        <!-- Full Name -->
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Your Full Name</label>
-          <input type="text" id="input-name" required placeholder="e.g. Dr. Amb. Toluwalase Praise-God" class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-medium">
+          <input type="text" id="user-display-name" required placeholder="e.g. Dr. Amb. Toluwalase Praise-God" value="Dr. Amb. Toluwalase Praise-God" class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-medium">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Role</label>
-            <select id="input-role" class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-              <option value="Host">Host / Mentor</option>
-              <option value="Presenter">Presenter</option>
-              <option value="Health Lead">Health Lead</option>
-              <option value="Corps Member" selected>Corps Member</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Location / Code</label>
-            <input type="text" id="input-location" placeholder="Minna or NG/25C/..." class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-medium">
-          </div>
+        <!-- Exco / Forum Hierarchy Role -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Exco / Forum Position</label>
+          <select id="user-exco-select" onchange="toggleCustomExco(this.value)" class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+            <option value="Acting Mentor" selected>Acting Mentor</option>
+            <option value="Mentor">Mentor</option>
+            <option value="Team Lead">Team Lead</option>
+            <option value="Assistant Team Lead">Assistant Team Lead</option>
+            <option value="Head of Auditions">Head of Auditions</option>
+            <option value="Program Manager 1">Program Manager 1</option>
+            <option value="Program Manager 2">Program Manager 2</option>
+            <option value="DCER">DCER (Director of Community & External Relations)</option>
+            <option value="Media Head">Media Head</option>
+            <option value="Assistant Media Head">Assistant Media Head</option>
+            <option value="Member">Member</option>
+            <option value="Other">Other / Custom Position</option>
+          </select>
         </div>
 
-        <!-- Initial Device Settings -->
-        <div class="bg-slate-950/80 rounded-xl p-3 border border-emerald-950 space-y-2 text-xs">
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" id="join-mic" checked class="accent-emerald-500">
-            <span class="text-slate-300">Start with microphone unmuted</span>
-          </label>
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" id="join-cam" class="accent-emerald-500">
-            <span class="text-slate-300">Start with camera enabled</span>
-          </label>
+        <!-- Custom Exco Input (Hidden by default) -->
+        <div id="custom-exco-wrapper" class="hidden">
+          <label class="block text-xs font-semibold text-amber-400 mb-1">Specify Custom Exco / Forum Position</label>
+          <input type="text" id="custom-exco-input" placeholder="Enter your official role" class="w-full bg-slate-950 border border-amber-600/80 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none font-medium">
         </div>
 
-        <button type="submit" id="btn-enter" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center justify-center space-x-2 transition">
+        <!-- Show / On-Air Role -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Show / On-Air Assignment (Prestige FM 91.7)[cite: 1, 2]</label>
+          <select id="user-show-select" onchange="toggleCustomShow(this.value)" class="w-full bg-slate-950 border border-emerald-800/80 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+            <option value="Anchor" selected>Anchor</option>
+            <option value="Co-Presenter">Co-Presenter</option>
+            <option value="Newscaster">Newscaster</option>
+            <option value="Weekly Tips">Weekly Tips Presenter</option>
+            <option value="Producer / Technical">Producer / Technical Lead</option>
+            <option value="Reviewer / Audience">Reviewer / Audience</option>
+            <option value="Other">Other Assignment</option>
+          </select>
+        </div>
+
+        <!-- Custom Show Role Input (Hidden by default) -->
+        <div id="custom-show-wrapper" class="hidden">
+          <label class="block text-xs font-semibold text-amber-400 mb-1">Specify Custom Show Assignment</label>
+          <input type="text" id="custom-show-input" placeholder="Enter assignment title" class="w-full bg-slate-950 border border-amber-600/80 rounded-lg px-3.5 py-2 text-xs text-white focus:outline-none font-medium">
+        </div>
+
+        <button type="submit" class="w-full mt-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center justify-center space-x-2 transition">
           <i class="fa-solid fa-satellite-dish"></i>
           <span>Enter Live Studio Room</span>
         </button>
@@ -88,164 +122,321 @@
   <!-- ========================================== -->
   <!-- 2. STUDIO TOP BAR -->
   <!-- ========================================== -->
-  <header class="bg-emerald-950 border-b border-emerald-800/60 px-4 py-2.5 flex items-center justify-between sticky top-0 z-40">
+  <header class="bg-emerald-950/90 border-b border-emerald-800/60 px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 backdrop-blur-md">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-full border-2 border-amber-500 overflow-hidden bg-emerald-900 flex items-center justify-center flex-shrink-0">
-        <img src="logo.jpg" alt="Logo" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-microphone-lines text-amber-400 text-base\'></i>';" class="w-full h-full object-cover">
+      <div class="w-10 h-10 rounded-full border-2 border-amber-500 overflow-hidden shadow-md flex-shrink-0 bg-emerald-900 flex items-center justify-center">
+        <img src="logo.jpg" alt="Logo" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-microphone-lines text-amber-400 text-lg\'></i>';" class="w-full h-full object-cover">
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-bold tracking-tight text-white leading-tight">CORPERS' FORUM</h1>
-          <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase">91.7 FM</span>
+          <h1 class="text-base font-bold tracking-tight text-white leading-tight">CORPERS' FORUM</h1>
+          <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider">91.7 FM</span>
         </div>
-        <p class="text-[11px] text-emerald-300 font-medium">Where Your Voice Counts • Live Broadcast Room[cite: 1, 2]</p>
+        <p class="text-xs text-emerald-300 font-medium">Where Your Voice Counts • Minna, Niger State[cite: 1, 2]</p>
       </div>
     </div>
 
-    <!-- Toggle Agenda Drawer -->
-    <button onclick="toggleAgenda()" class="bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 border border-emerald-700/60 text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition">
-      <i class="fa-solid fa-list-check"></i>
-      <span class="hidden sm:inline">Review Pillars</span>
-    </button>
+    <!-- Active Call Clock & Launch Shortcut -->
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <div class="hidden sm:flex items-center space-x-2 bg-emerald-900/60 border border-emerald-700/50 px-2.5 py-1 rounded-full text-xs text-emerald-200">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="call-timer">00:00:00</span>
+      </div>
+      <a href="https://join.freeconferencecall.com/akoredegiwa228" target="_blank" rel="noopener noreferrer" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center space-x-1.5 shadow transition">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Open Meeting Room</span>
+      </a>
+    </div>
   </header>
 
   <!-- ========================================== -->
-  <!-- 3. REAL LIVE VIDEO CONTAINER -->
+  <!-- 3. MAIN WORKBENCH -->
   <!-- ========================================== -->
-  <main class="flex-1 flex relative overflow-hidden">
-    
-    <!-- Real Live Conference Frame -->
-    <div class="flex-1 flex flex-col p-2 sm:p-3 relative bg-slate-950">
-      <div id="jitsi-container" class="w-full h-full flex-1 rounded-xl overflow-hidden bg-slate-900 border border-emerald-900/60 shadow-inner flex items-center justify-center">
-        <div class="text-center p-6 text-slate-500">
-          <i class="fa-solid fa-spinner fa-spin text-2xl text-emerald-500 mb-2"></i>
-          <p class="text-xs">Connecting to Corpers' Forum secure channel...</p>
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+
+    <!-- DESK & ACTIVE BROADCAST STAGE (LEFT) -->
+    <section class="flex-1 flex flex-col p-3 md:p-4 gap-3 overflow-y-auto custom-scrollbar">
+
+      <!-- MAIN SPOTLIGHT & CALL GATEWAY -->
+      <div class="relative bg-gradient-to-b from-slate-900 to-emerald-950/40 border border-emerald-900/80 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center shadow-2xl min-h-[300px]">
+        
+        <div class="relative mb-3">
+          <div class="w-24 h-24 rounded-full bg-emerald-900 border-4 border-amber-500 flex items-center justify-center shadow-lg speaking-pulse">
+            <i class="fa-solid fa-microphone-lines text-amber-300 text-3xl"></i>
+          </div>
+          <span id="active-badge-tag" class="absolute bottom-1 right-0 bg-emerald-600 text-[10px] text-white px-2 py-0.5 rounded-full font-bold uppercase shadow">
+            Active
+          </span>
+        </div>
+
+        <h2 id="active-user-title" class="text-xl font-bold text-white tracking-wide">Dr. Amb. Toluwalase Praise-God</h2>
+        <div id="active-badges-container" class="flex flex-wrap items-center justify-center gap-2 mt-2">
+          <span id="badge-exco" class="bg-emerald-950 border border-emerald-600/70 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">
+            Acting Mentor
+          </span>
+          <span class="text-slate-500">•</span>
+          <span id="badge-show" class="bg-amber-950 border border-amber-600/70 text-amber-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">
+            Anchor
+          </span>
+        </div>
+
+        <p class="text-xs text-slate-300 mt-3 max-w-md">
+          Connected to the Corpers' Forum 3-4 Hour Permanent Production Channel on FreeConferenceCall.
+        </p>
+
+        <!-- Direct Launch Action -->
+        <div class="mt-5 flex flex-wrap gap-3 justify-center">
+          <a href="https://join.freeconferencecall.com/akoredegiwa228" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center space-x-2 shadow-lg transition">
+            <i class="fa-solid fa-phone-volume text-sm"></i>
+            <span>Reconnect / Join Conference Audio</span>
+          </a>
         </div>
       </div>
-    </div>
 
-    <!-- Collapsible Broadcast Pillars / Agenda Sidebar -->
-    <aside id="agenda-sidebar" class="w-80 bg-slate-900 border-l border-emerald-900/70 flex flex-col p-4 custom-scrollbar overflow-y-auto hidden">
-      <div class="flex items-center justify-between pb-3 border-b border-emerald-900/60 mb-3">
-        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-broadcast-tower"></i> Broadcast Pillars[cite: 2]
-        </h3>
-        <button onclick="toggleAgenda()" class="text-slate-400 hover:text-white text-xs">
-          <i class="fa-solid fa-xmark"></i>
+      <!-- BROADCAST ROSTER OVERVIEW (DYNAMIC TEAM ROLES) -->
+      <div class="flex-1 min-h-[140px]">
+        <div class="flex items-center justify-between pb-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-users-viewfinder"></i> Studio Delegation & Roles
+          </h3>
+          <span class="text-[11px] text-slate-400">Prestige FM 91.7 Production Team[cite: 1, 2]</span>
+        </div>
+
+        <div id="leadership-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT WORKBENCH: AGENDA PILLARS & MEETING MINUTES -->
+    <aside class="w-full lg:w-96 bg-slate-900 border-t lg:border-t-0 lg:border-l border-emerald-900/70 flex flex-col flex-shrink-0">
+      
+      <!-- TAB NAVIGATION -->
+      <div class="flex border-b border-emerald-900/60 bg-emerald-950/40 text-xs font-semibold">
+        <button onclick="switchTab('agenda')" id="tab-btn-agenda" class="flex-1 py-3 text-center border-b-2 border-amber-500 text-amber-400">
+          <i class="fa-solid fa-list-check mr-1"></i> Review Pillars[cite: 2]
+        </button>
+        <button onclick="switchTab('notes')" id="tab-btn-notes" class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-pen-to-square mr-1"></i> Meeting Minutes
         </button>
       </div>
 
-      <div class="space-y-2.5 text-xs">
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">1. Career & Personal Development[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">Making service year count, skill building, CV prep[cite: 2].</p>
+      <!-- TAB 1: 6 EDITORIAL PILLARS -->
+      <div id="tab-agenda" class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-3.5">
+        
+        <div class="bg-emerald-950/50 p-3 rounded-xl border border-emerald-700/50">
+          <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Production Agenda</span>
+          <h4 class="text-xs font-bold text-white mt-0.5">Sunday Pre-Review & Monday Post-Review (8:00 PM)</h4>
         </div>
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">2. Money & Entrepreneurship[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">Managing allowance, enterprise, investments[cite: 2].</p>
+
+        <div class="space-y-2">
+          <h5 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Broadcast Pillars[cite: 2]</h5>
+          
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" checked class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">1. Career & Personal Development[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">Skill acquisition, CV growth, and post-NYSC preparation[cite: 2].</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" checked class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">2. Money & Entrepreneurship[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">Allowance budgeting, business ventures, and investments[cite: 2].</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" checked class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">3. Health & Wellbeing[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">Physical fitness, emotional wellbeing, and personal care[cite: 2].</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">4. Love, Relationships & Social Life[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">Friendships, social boundaries, and networking[cite: 2].</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">5. Service & Community[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">CDS community projects and PPA milestones in Niger State[cite: 1, 2].</p>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-slate-950/70 border border-emerald-900/50 flex items-start space-x-2.5 text-xs">
+            <input type="checkbox" class="mt-0.5 accent-emerald-500 rounded">
+            <div>
+              <p class="font-bold text-slate-200">6. Life After NYSC[cite: 2]</p>
+              <p class="text-[11px] text-slate-400">POP transition, further education, and career opportunities[cite: 2].</p>
+            </div>
+          </div>
         </div>
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">3. Health & Wellbeing[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">Physical health, emotional wellness, self-care[cite: 2].</p>
-        </div>
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">4. Love, Relationships & Social Life[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">Friendships, social boundaries, new environments[cite: 2].</p>
-        </div>
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">5. Service & Community[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">PPA impact, CDS initiatives in Niger State[cite: 1, 2].</p>
-        </div>
-        <div class="p-2.5 rounded-lg bg-slate-950 border border-emerald-950">
-          <p class="font-bold text-slate-200">6. Life After NYSC[cite: 2]</p>
-          <p class="text-[11px] text-slate-400">Post-POP career transitions, opportunities[cite: 2].</p>
+
+        <div class="pt-3 border-t border-emerald-900/40 text-[11px] text-slate-400 space-y-1">
+          <p class="text-amber-400 font-semibold">Official Channels[cite: 2]:</p>
+          <p><i class="fa-brands fa-instagram text-emerald-400 mr-1.5"></i> @corpersforum_official[cite: 2]</p>
+          <p><i class="fa-brands fa-facebook text-emerald-400 mr-1.5"></i> Corpers Forum 91.7 Prestige FM Minna[cite: 2]</p>
+          <p><i class="fa-solid fa-envelope text-emerald-400 mr-1.5"></i> corpersforumofficialniger@gmail.com[cite: 2]</p>
         </div>
       </div>
 
-      <div class="pt-4 mt-auto border-t border-emerald-900/40 text-[11px] text-slate-400 space-y-1">
-        <p class="text-amber-400 font-semibold">Official Channels[cite: 2]:</p>
-        <p>IG: @corpersforum_official[cite: 2]</p>
-        <p>FB: Corpers Forum 91.7 Prestige FM Minna[cite: 2]</p>
-        <p>Email: corpersforumofficialniger@gmail.com[cite: 2]</p>
+      <!-- TAB 2: LIVE MINUTES SCRATCHPAD -->
+      <div id="tab-notes" class="p-3 flex-1 overflow-y-auto custom-scrollbar hidden flex flex-col justify-between">
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center justify-between pb-2">
+            <span class="text-xs font-bold text-emerald-400">Studio Review Minutes</span>
+            <button onclick="copyMinutes()" class="text-[11px] bg-emerald-950 border border-emerald-700/60 text-emerald-300 px-2 py-0.5 rounded font-semibold hover:bg-emerald-900">
+              <i class="fa-solid fa-copy mr-1"></i> Copy
+            </button>
+          </div>
+          <textarea id="meeting-minutes-pad" placeholder="Type key decisions, presenter notes, on-air review points, or action items here..." class="flex-1 w-full bg-slate-950 border border-emerald-900/80 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono resize-none h-64"></textarea>
+        </div>
       </div>
+
     </aside>
   </main>
 
   <!-- ========================================== -->
-  <!-- 4. LIVE LOGIC -->
+  <!-- 4. JAVASCRIPT LOGIC -->
   <!-- ========================================== -->
   <script>
-    let jitsiApi = null;
+    const MEETING_URL = "https://join.freeconferencecall.com/akoredegiwa228";
+    let timerSeconds = 0;
 
-    function joinLiveRoom(e) {
-      e.preventDefault();
+    // Call Clock
+    setInterval(() => {
+      timerSeconds++;
+      const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(timerSeconds % 60).padStart(2, '0');
+      document.getElementById('call-timer').innerText = `${hrs}:${mins}:${secs}`;
+    }, 1000);
 
-      const name = document.getElementById('input-name').value.trim();
-      const role = document.getElementById('input-role').value;
-      const location = document.getElementById('input-location').value.trim() || 'Minna';
-      const micOn = document.getElementById('join-mic').checked;
-      const camOn = document.getElementById('join-cam').checked;
-
-      if (!name) return;
-
-      const formattedDisplayName = `${name} [${role}]`;
-
-      // Hide Lobby Screen
-      document.getElementById('lobby-screen').classList.add('hidden');
-
-      // Clear loading indicator
-      const container = document.getElementById('jitsi-container');
-      container.innerHTML = '';
-
-      // Initialize real shared Jitsi room
-      // Fixed room name ensures every member who clicks the link enters the SAME room
-      const domain = 'meet.jit.si';
-      const options = {
-        roomName: 'CorpersForumPrestigeFM917MinnaReviewStudio',
-        width: '100%',
-        height: '100%',
-        parentNode: container,
-        userInfo: {
-          displayName: formattedDisplayName
-        },
-        configOverwrite: {
-          startWithAudioMuted: !micOn,
-          startWithVideoMuted: !camOn,
-          prejoinPageEnabled: false,
-          enableWelcomePage: false,
-          disableDeepLinking: true,
-          toolbarButtons: [
-            'microphone', 'camera', 'desktop', 'chat', 'raisehand',
-            'tileview', 'settings', 'hangup'
-          ]
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_WATERMARK_FOR_GUESTS: false,
-          DEFAULT_REMOTE_DISPLAY_NAME: 'Corps Member',
-          TOOLBAR_BUTTONS: [
-            'microphone', 'camera', 'desktop', 'chat', 'raisehand',
-            'tileview', 'settings', 'hangup'
-          ]
-        }
-      };
-
-      try {
-        jitsiApi = new JitsiMeetExternalAPI(domain, options);
-        jitsiApi.addEventListeners({
-          readyToClose: () => {
-            window.location.reload();
-          }
-        });
-      } catch (err) {
-        alert("Failed to connect to the meeting server. Please check your internet connection.");
+    // Toggle Custom Exco Input
+    function toggleCustomExco(val) {
+      const wrap = document.getElementById('custom-exco-wrapper');
+      if (val === 'Other') {
+        wrap.classList.remove('hidden');
+        document.getElementById('custom-exco-input').focus();
+      } else {
+        wrap.classList.add('hidden');
       }
     }
 
-    function toggleAgenda() {
-      const sidebar = document.getElementById('agenda-sidebar');
-      sidebar.classList.toggle('hidden');
+    // Toggle Custom Show Input
+    function toggleCustomShow(val) {
+      const wrap = document.getElementById('custom-show-wrapper');
+      if (val === 'Other') {
+        wrap.classList.remove('hidden');
+        document.getElementById('custom-show-input').focus();
+      } else {
+        wrap.classList.add('hidden');
+      }
     }
+
+    // Handle Join / Submit Form
+    function handleJoinMeeting(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('user-display-name').value.trim();
+      let excoRole = document.getElementById('user-exco-select').value;
+      let showRole = document.getElementById('user-show-select').value;
+
+      if (excoRole === 'Other') {
+        excoRole = document.getElementById('custom-exco-input').value.trim() || 'Exco';
+      }
+      if (showRole === 'Other') {
+        showRole = document.getElementById('custom-show-input').value.trim() || 'Participant';
+      }
+
+      if (!name) return;
+
+      // Update Active UI
+      document.getElementById('active-user-title').innerText = name;
+      document.getElementById('badge-exco').innerText = excoRole;
+      document.getElementById('badge-show').innerText = showRole;
+      document.getElementById('active-badge-tag').innerText = excoRole.split(' ')[0];
+
+      // Hide Onboarding Overlay
+      document.getElementById('onboarding-screen').classList.add('hidden');
+
+      // Launch FreeConferenceCall in an optimized new tab/window
+      window.open(MEETING_URL, '_blank');
+
+      // Populate Sample Delegations
+      renderDelegates(name, excoRole, showRole);
+    }
+
+    // Render Delegate Cards
+    function renderDelegates(userName, userExco, userShow) {
+      const grid = document.getElementById('leadership-grid');
+      const sampleTeam = [
+        { name: userName, exco: userExco, show: userShow, isCurrent: true },
+        { name: "Salami Maryam (SMT)", exco: "Head of Auditions", show: "Co-Presenter", isCurrent: false },
+        { name: "Nurse Esther", exco: "Program Manager 1", show: "Weekly Tips", isCurrent: false },
+        { name: "Nurse Mayowa", exco: "Program Manager 2", show: "Co-Presenter", isCurrent: false },
+        { name: "Amb. Hauwa M. Idris", exco: "Media Head", show: "Producer / Technical", isCurrent: false },
+        { name: "Corps Member Rep", exco: "Member", show: "Reviewer / Audience", isCurrent: false }
+      ];
+
+      grid.innerHTML = '';
+      sampleTeam.forEach(t => {
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border ${t.isCurrent ? 'bg-emerald-950/60 border-amber-500/80 shadow-md' : 'bg-slate-900 border-emerald-950'} flex flex-col justify-between text-left`;
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold ${t.isCurrent ? 'text-amber-400' : 'text-emerald-400'} uppercase">${t.exco}</span>
+              ${t.isCurrent ? '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>' : ''}
+            </div>
+            <p class="font-bold text-slate-200 text-xs mt-1 truncate">${t.name}</p>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Assignment:</span>
+            <span class="font-semibold text-slate-200">${t.show}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+      ['agenda', 'notes'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${t}`).classList.remove('border-amber-500', 'text-amber-400');
+        document.getElementById(`tab-btn-${t}`).classList.add('border-transparent', 'text-slate-400');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tab}`).classList.add('border-amber-500', 'text-amber-400');
+      document.getElementById(`tab-btn-${tab}`).classList.remove('border-transparent', 'text-slate-400');
+    }
+
+    // Copy Minutes Pad
+    function copyMinutes() {
+      const pad = document.getElementById('meeting-minutes-pad');
+      if (!pad.value.trim()) {
+        alert("The minutes scratchpad is currently empty.");
+        return;
+      }
+      navigator.clipboard.writeText(pad.value).then(() => {
+        alert("Meeting minutes copied to clipboard!");
+      });
+    }
+
+    // Initial render
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDelegates("Dr. Amb. Toluwalase Praise-God", "Acting Mentor", "Anchor");
+    });
   </script>
 </body>
 </html>
